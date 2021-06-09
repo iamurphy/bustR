@@ -1,0 +1,16 @@
+citHeader("To cite bustR in publications use:")
+
+citEntry(
+  entry    = "manual",
+  title    = "{bustr}: Bottom-phase identification for Underwater Serially Tracked animals using R",
+  author   = "Ian A. Murphy",
+  organization = "University at British Columbia",
+    address = "Vancouver, BC",
+    note = "version 0.1.0",
+    year = "2021",
+    url = "http://github.com/iamurphy/bustR",
+    textVersion  = paste("Murphy, I. A. (2021).",
+        "bustr: Package for Bottom-phase identification for Underwater Serially Tracked animals using R",
+        "version 0.1.0. University at British Columbia. Vancouver, BC.",
+        "http://github.com/iamurphy/bustR")
+)

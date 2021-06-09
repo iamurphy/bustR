@@ -1,0 +1,149 @@
+---
+title: "Introduction to bustR"
+author: "Ian Murphy"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to bustR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The goal of the __bustR__ (*B*ottom phase identification for *U*nderwater *S*erially *T*racked animals) package is to provide a group of useful functions to work with time-depth record data (TDR data) for marine mammals that exhibit diving behaviour, and allow for a user to define the bottom phase of a set of dives. The main feature of this package is an interactive Shiny app that allows users to manually classify the bottom phase of their dives (which inherently defines the descent and ascent phases as well). 
+
+There are several other R packages which provide a plethora of dive manipulation functions, such as __diveMove__ which is available on [CRAN](https://CRAN.R-project.org/package=diveMove) and __tagtools__ which is available on [Github](https://github.com/stacyderuiter/TagTools). However, the purpose of __bustR__ is not to extensively manipulate and/or analyze diving data, rather it is a tool that provides the user the ability to classify dive phase definitions.
+
+This vignette will provide a walkthrough of how to use the __bustR__ package, specifically the Shiny App. The App will produce a dataset that can then be used in the modelling stage to create a model for the bottom phase of dives.
+
+## Overview
+
+General flow of how this package runs:
+
+1. Read in already cleaned and labelled TDR data.
+2. Run the ShinyApp and label the bottom phase for the dives. 
+3. Produce the dataframe of the labelled bottom phases for each dive.
+
+Before we begin, we need to load the __bustR__ package, as well as the `tidyverse` (v. 1.3.0) package for ease of plotting. 
+
+```{r setup, message=FALSE}
+devtools::load_all("~/Desktop/bustR")
+library(tidyverse)
+```
+
+## Step 1 - Read in TDR data
+The first step is to read in the TDR data. This step must be done by the user themselves as there are no built in functions in this package to read in the diving data. The TDR data should be read in as a dataframe, preferably with a function such as `vroom::vroom()` or `readr::read_csv()`. Moreover, it is expected that this data is already cleaned and ready to be analyzed. For example, the time-depth data should already be smoothed, if necessary. 
+
+The TDR dataframe must:
+
+1. Have 3 distinct columns, named: $\texttt{time}$, $\texttt{depth}$, and $\texttt{dive_num}$. 
+
+  + The $\texttt{time}$ variable must be a distinct number for every row in your dataframe, and it should identify the timestamp correctly. $\texttt{time}$ should be a strictly increasing number as well. When in doubt, it may be easier for this value to just be the numbers $1, ..., N$, where $N$ is the total number of rows in this dataframe. 
+
+  + The $\texttt{depth}$ variable is a measure of the depth of the animal at each specific time frame. $\texttt{depth}$ should be negative. 
+
+  + Finally, the $\texttt{dive_num}$ variable should be a non-negative integer representing which dive the depth data corresponds to. Given an entire TDR sequence, the data can be split into individual dives, depending on several parameters such as a minimum depth requirement, and a surface level requirement. For the parts of the sequence which are __not__ dives, please leave $\texttt{dive_num}$ as a zero (0).
+
+2. Be cleaned and prepared. If the data have not been smoothed, for example, then the bottom phase classification will not be straightforward as there will be a lot of noise in the data. Consider cleaning and preparing the dataframe before doing any bottom phase classifications. 
+
+For example, consider the sample dataframe provided in this package, which can be accessed as follows:
+
+```{r}
+# Access the sample diving data.
+whale <- system.file("extdata", "whale_example.csv", package = "bustR")
+whale_data <- vroom::vroom(whale)
+```
+
+From this dataframe (or tibble), we can look at the structure to see what is required:
+
+```{r}
+head(whale_data)
+```
+
+And we can also take a look at the summary of these three columns:
+
+```{r}
+summary(whale_data)
+```
+
+We can also see the total number of dives which exist in this dataset:
+
+```{r}
+sort(unique(whale_data$dive_num))
+```
+
+From here, we see 11 unique dives. Notice that we also have zeros, which indicate that the whale is at the surface and is not currently engaged in a dive. It should be noted that dives are only considered true dives if they exceed 3 meters in depth. As such, any dives which are not below 3 meters and not constituted as dives. Plotting this TDR data, and making the surface portions in red, and labelling the true dives, we get the following:
+
+```{r, fig.width=7, fig.height=5}
+ggplot(whale_data, aes(x = time, y = depth, color = factor(dive_num))) +
+  geom_path(aes(group = 1))
+```
+
+From the above plot, all the lines in red are considered surface level behaviour and are not considered dives. The remaining dives are labelled from 1 to 11 as shown. 
+
+
+
+
+
+## Step 2 - Run the ShinyApp and label dives
+
+The next step is to run the ShinyApp and label the bottom phase of the dives. This is a critical aspect of this R package. To run this app, we call the function `runBottomPhaseApp()`. You must provide several arguments to this function. 
+
+### Required Parameters: 
+
+1. `entire_record` is the full TDR data that was previously read in.
+
+2. `file_path` (string) is the path to a folder or location on your computer where you want your data to be saved. Note that this folder must already exist for this to work and there must be nothing in this folder except possibly previously saved ShinyApp data from an earlier session (more on that later).
+
+### Optional Parameters:
+
+3. `init_num` (positive integer) is how many dives you want to view during this session. The default is `init_num = 10`. This value cannot be larger than the total number of dives in the dataset. 
+
+4. `rand_select` (boolean) specifies if you want the dives to be presented to you in a random order. If this parameter is `FALSE`, then you will see the dives starting from the beginning of your dataset. 
+
+5. `continuing` (boolean) is a special parameter that allows you to "pick up where you left off" so to speak. If this is the first time you are running the app, then you should set `continuing = FALSE` (this is the default). However, suppose you labelled 50 dives yesterday, and you want to label more today. Notice that you don't want to accidentally label those previous 50 dives again since that would be a waste of time. In this case, you should set `continuing = TRUE`. This will avoid the previously saved data in that directory. Notice: if you accidentally set `continuing = FALSE`, but data already exists in that directory, you will get a warning message telling you your previous data will be overwritten. Similarly, if `continuing = TRUE`, but no data exist in the folder, you will get a warning letting you know. 
+
+6. `custom_dives` (vector of positive integers) is a vector of integers of the dives you want to label, which must be numbers that exist in the TDR `dive_num` column. 
+
+7. `launch_browser` (boolean) will launch the ShinyApp in your default browser if `launch_browser = TRUE`. 
+
+As an example, to run the Shiny App, we use the `runBottomPhaseApp` as follows:
+
+```{r eval=FALSE}
+bustR::runBottomPhaseApp(entire_record = whale_data,
+                         file_path = "~/Desktop/my_whale_data",
+                         init_num = 5,
+                         rand_select = FALSE,
+                         continuing = FALSE,
+                         launch_browser = TRUE)
+```
+
+You should try this function out and play around with the parameters using this toy dataset to get a feel for how things work. 
+
+After submitting information for each dive, the information is saved in the `file_path` directory where each dive is an individual csv file, named appropriately. You can close the app at any point, and all previously labelled dives will be saved. Once you are done with the Shiny App, you now have a folder containing the bottom phase information for each dive in your dataset. You can now use this information to build models for the bottom phase of the dive. More extensive modelling can be found in my Master's thesis, or in my paper (as soon as it is published). 
+
+
+## Step 4 (Optional) - Load resulting data and produce summary statistics
+At this point, you will have a directory on your computer containing a bunch of csv files with your data stored in them. To access this data, we will use the `results()` function. This function requires two parameters: `f`, the full_data dataframe that we read in, and `outdir` which is the path to where all those csv files are located. 
+
+Moreover, we can call `summary` on the output of the `results` function to produce several sumamry statistics about this data. This function is run as follows:
+
+```{r eval = FALSE}
+r <- results(whale_data, "~/Desktop/my_whale_data")
+summary(r)
+```
+
+And from this results function, we can also look at the bottom phase data that was provided by the user. This is going to be the dataframe that we are most interested in since we can use this in the modelling stage. 
+
+```{r, eval=FALSE}
+u <- r$bottom_phase_data
+u
+```
+
+
+

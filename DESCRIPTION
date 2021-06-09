@@ -1,0 +1,35 @@
+Package: bustR
+Type: Package
+Title: Bottom phase identification for Underwater Serially Tracked animals
+Version: 0.1.0
+Author: Ian Murphy
+Maintainer: <ian.murphy@stat.ubc.ca>
+BugReports: https://github.com/iamurphy/bustR/issues
+Description: This package is used to manually label the phases of dives in a time-depth
+    dataset. The labelling of dives is done using Shiny, an R package which creates 
+    interactive web applications. This package also provides tools which allow the users 
+    to manually label only a subset of the total number of dives in their dataset, then 
+    build models using this training data which can be applied to the remainder of their dataset.
+License: CC0
+Encoding: UTF-8
+LazyData: true
+Depends: 
+    R (>= 2.10),
+    shiny
+RoxygenNote: 7.1.1
+Imports:
+	tidyverse,
+	ggplot2,
+	dplyr,
+	magrittr,
+	readr,
+	vroom,
+	shinyalert,
+	shinyjs,
+	shinyBS,
+	progress,
+	knitr,
+	kableExtra
+VignetteBuilder: knitr
+Suggests: 
+    rmarkdown
