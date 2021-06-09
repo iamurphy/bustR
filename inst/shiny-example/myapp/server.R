@@ -59,14 +59,14 @@ server <- function(input, output, session) {
     subData <- dplyr::filter(complete_info, complete_info$dive_num == .rand_dives[vals$count])
 
     max_i <- which.max(subData$depth)
-    max_t <- as.numeric(subData$numeric_time[max_i])
+    max_t <- as.numeric(subData$time[max_i])
 
     v$subData <- subData
-    v$start <- subData$numeric_time[1]
-    v$end <- subData$numeric_time[nrow(subData)]
+    v$start <- subData$time[1]
+    v$end <- subData$time[nrow(subData)]
     v$dive_num <- subData$dive_num[1]
-    v$dive_start_time <- subData$numeric_time[1]
-    v$dive_end_time <- subData$numeric_time[nrow(subData)]
+    v$dive_start_time <- subData$time[1]
+    v$dive_end_time <- subData$time[nrow(subData)]
     v$max_t <- max_t
 
   })
@@ -78,14 +78,14 @@ server <- function(input, output, session) {
     subData <- dplyr::filter(complete_info, complete_info$dive_num == .rand_dives[vals$count])
 
     max_i <- which.max(subData$depth)
-    max_t <- as.numeric(subData$numeric_time[max_i])
+    max_t <- as.numeric(subData$time[max_i])
 
     v$subData <- subData
-    v$start <- subData$numeric_time[1]
-    v$end <- subData$numeric_time[nrow(subData)]
+    v$start <- subData$time[1]
+    v$end <- subData$time[nrow(subData)]
     v$dive_num <- subData$dive_num[1]
-    v$dive_start_time <- subData$numeric_time[1]
-    v$dive_end_time <- subData$numeric_time[nrow(subData)]
+    v$dive_start_time <- subData$time[1]
+    v$dive_end_time <- subData$time[nrow(subData)]
     v$max_t <- max_t
   })
 
@@ -94,14 +94,14 @@ server <- function(input, output, session) {
     subData <- dplyr::filter(complete_info, complete_info$dive_num == .rand_dives[vals$count])
 
     max_i <- which.max(subData$depth)
-    max_t <- as.numeric(subData$numeric_time[max_i])
+    max_t <- as.numeric(subData$time[max_i])
 
     v$subData <- subData
-    v$start <- subData$numeric_time[1]
-    v$end <- subData$numeric_time[nrow(subData)]
+    v$start <- subData$time[1]
+    v$end <- subData$time[nrow(subData)]
     v$dive_num <- subData$dive_num[1]
-    v$dive_start_time <- subData$numeric_time[1]
-    v$dive_end_time <- subData$numeric_time[nrow(subData)]
+    v$dive_start_time <- subData$time[1]
+    v$dive_end_time <- subData$time[nrow(subData)]
     v$max_t <- max_t
   })
 
@@ -113,14 +113,14 @@ server <- function(input, output, session) {
   #   subData <- dplyr::filter(complete_info, complete_info$dive_num == .rand_dives[vals$count])
   #
   #   max_i <- which.max(subData$depth)
-  #   max_t <- as.numeric(subData$numeric_time[max_i])
+  #   max_t <- as.numeric(subData$time[max_i])
   #
   #   v$subData <- subData
-  #   v$start <- subData$numeric_time[1]
-  #   v$end <- subData$numeric_time[nrow(subData)]
+  #   v$start <- subData$time[1]
+  #   v$end <- subData$time[nrow(subData)]
   #   v$dive_num <- subData$dive_num[1]
-  #   v$dive_start_time <- subData$numeric_time[1]
-  #   v$dive_end_time <- subData$numeric_time[nrow(subData)]
+  #   v$dive_start_time <- subData$time[1]
+  #   v$dive_end_time <- subData$time[nrow(subData)]
   #   v$max_t <- max_t
   #
   #   subData
@@ -132,11 +132,11 @@ server <- function(input, output, session) {
 
     if(is.null(v$subData)) return()
     subData2 <- v$subData
-    num.time <- as.numeric(subData2$numeric_time)
+    num.time <- as.numeric(subData2$time)
 
     # # Set up the data for the plot. Modify the x axis
     x <- ggplot(data=subData2,
-                aes(x=as.numeric(numeric_time), y = depth)) +
+                aes(x=as.numeric(time), y = depth)) +
       ggplot2::labs(x = "Time (in seconds)",
                     y = "Depth (m)",
                     title = paste("Dive #", as.character(subData2$dive_num), sep = "")) +

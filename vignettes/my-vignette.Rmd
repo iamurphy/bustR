@@ -77,14 +77,14 @@ We can also see the total number of dives which exist in this dataset:
 sort(unique(whale_data$dive_num))
 ```
 
-From here, we see 11 unique dives. Notice that we also have zeros, which indicate that the whale is at the surface and is not currently engaged in a dive. It should be noted that dives are only considered true dives if they exceed 3 meters in depth. As such, any dives which are not below 3 meters and not constituted as dives. Plotting this TDR data, and making the surface portions in red, and labelling the true dives, we get the following:
+From here, we see 10 unique dives. Notice that we also have zeros, which indicate that the whale is at the surface and is not currently engaged in a dive. It should be noted that dives are only considered true dives if they exceed 3 meters in depth. As such, any dives which are not below 3 meters and not constituted as dives. Plotting this TDR data, and making the surface portions in red, and labelling the true dives, we get the following:
 
 ```{r, fig.width=7, fig.height=5}
 ggplot(whale_data, aes(x = time, y = depth, color = factor(dive_num))) +
   geom_path(aes(group = 1))
 ```
 
-From the above plot, all the lines in red are considered surface level behaviour and are not considered dives. The remaining dives are labelled from 1 to 11 as shown. 
+From the above plot, all the lines in red are considered surface level behaviour and are not considered dives. The remaining dives are labelled from 1 to 10 as shown. 
 
 
 
