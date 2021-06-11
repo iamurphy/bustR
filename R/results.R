@@ -27,12 +27,6 @@ results <- function(f, outdir){
   value$avg_percentof_md_end_BP   <- abs(mean(as.numeric(phases$depth_ending_bottom   / phases$max_depth_dive)))
   value$var_percentof_md_end_BP   <- abs(var(as.numeric(phases$depth_ending_bottom   / phases$max_depth_dive)))
 
-  value$avg_s_start_BP <- mean(as.numeric(phases$speed_begining_bottom))
-  value$var_s_start_BP <- var(as.numeric(phases$speed_begining_bottom))
-
-  value$avg_s_end_BP   <- mean(as.numeric(phases$speed_ending_bottom))
-  value$var_s_end_BP   <- var(as.numeric(phases$speed_ending_bottom))
-
   value$avg_BTW_ratio <- mean(as.numeric(phases$bottom_to_whole_ratio))
   value$var_BTW_ratio <- var(as.numeric(phases$bottom_to_whole_ratio))
 

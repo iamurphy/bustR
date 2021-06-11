@@ -16,10 +16,10 @@ process_data <- function(complete_data, bottom_phase_results){
 
   for (i in 1:(length(unique(phases$dive_num)))) {
 
-    begin_dive <- findInterval(phases$dive_start[i], dat$numeric_time)
-    begin_bottom <- findInterval(phases$startBP[i], dat$numeric_time)
-    end_bottom <- findInterval(phases$endBP[i], dat$numeric_time)
-    end_dive <- findInterval(phases$dive_end[i], dat$numeric_time)
+    begin_dive <- findInterval(phases$dive_start[i], dat$time)
+    begin_bottom <- findInterval(phases$startBP[i], dat$time)
+    end_bottom <- findInterval(phases$endBP[i], dat$time)
+    end_dive <- findInterval(phases$dive_end[i], dat$time)
 
     if(begin_dive == 0){
       begin_dive <- begin_dive + 1
@@ -57,11 +57,6 @@ process_data <- function(complete_data, bottom_phase_results){
     phases$depth_begining_bottom[i] <- dat[begin_bottom, ]$depth
     phases$depth_ending_bottom[i] <- dat[end_bottom, ]$depth
 
-    phases$min_speed_dive[i] <- min(sliced_dat$speed)
-    phases$max_speed_dive[i] <- max(sliced_dat$speed)
-    phases$speed_begining_bottom[i] <- dat[begin_bottom, ]$speed
-    phases$speed_ending_bottom[i] <- dat[end_bottom, ]$speed
-
     phases$dive_duration_seconds[i] <- as.numeric(phases$dive_end[i] - phases$dive_start[i])
 
     phases$bottom_duration_seconds[i] <- as.numeric(phases$endBP[i] - phases$startBP[i])
@@ -69,13 +64,6 @@ process_data <- function(complete_data, bottom_phase_results){
     phases$bottom_to_whole_ratio[i] <- as.numeric(phases$bottom_duration_seconds[i] /
                                                     phases$dive_duration_seconds[i])
 
-    phases$avg_descent_speed[i] <- mean(dat[begin_dive:begin_bottom,]$speed)
-    phases$avg_ascent_speed[i]  <- mean(dat[end_bottom:end_dive,]$speed)
-
-    # Define bottom variance to be the variance of vertical depth during the bottom
-    # phase. This is a proxy for wiggles. Lots of wiggles = high variance. Minimal wiggles
-    # = low variance.
-    # phases$bottom_depth_variance[i] <- var(dat[begin_bottom:end_bottom,]$depth)
   }
   return(list(phases = phases))
 }
